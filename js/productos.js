@@ -11,7 +11,7 @@ const productos = [
   { 
     nombre: "AirPods 3ra", 
     precio: 9, 
-    oferta: "", 
+    oferta: 8, 
     categoria: "Audio", 
     imagen: "./img/Productos/Airpods3ra.png" 
   },
