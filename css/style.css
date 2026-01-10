@@ -219,13 +219,30 @@
     font-weight: bold;
     color: #000000; /* Negro */
 }
+
+.preciol{
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #000000; /* Negro */
+    padding-top: 0;
+    margin-top: -10px;
+}
 .oferta {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: green; /* Verde Oferta */
     padding: 0;
     margin: 0;
   }
+
+.ofertaCarrito {
+    font-size: 1.0rem;
+    font-weight: bold;
+    color: green; /* Verde Oferta */
+    padding: 0;
+    margin: 0;
+  }
+
 
   .oferta-title{
     background-color: var(--color-principal);
