@@ -50,7 +50,7 @@ function actualizarCarrito() {
               <div>
                 <h6 class="mb-1">${p.nombre || 'Producto'}</h6>
                 ${ofertaUSD !== null 
-                  ? `<small><del>${convertirPrecio(precioUSD)}</del> <span class="oferta fw-bold">${convertirPrecio(ofertaUSD)}</span></small>` 
+                  ? `<small><del class="preciol">${convertirPrecio(precioUSD)}</del> <span class="ofertaCarrito fw-bold">${convertirPrecio(ofertaUSD)}</span></small>` 
                   : `<small class="fw-bold">${convertirPrecio(precioUSD)}</small>`}
                 <div class="mt-1">
                   <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${i}, -1)"> - </button>

@@ -183,15 +183,15 @@ function renderProductos(lista) {
     col.className = "col-md-2 col-6 mt-0 p-1";
     col.innerHTML = `
       <div class="card h-100 text-center">
-        ${ofertaUSD !== null ? `<p class="oferta-title text-danger">En Oferta</p>` : ""}
+        ${ofertaUSD !== null ? `<p class="oferta-title">En Oferta</p>` : ""}
         <img src="${p.imagen || './img/Productos/default.jpg'}" class="card-img-top" alt="${p.nombre || ''}">
         <div class="card-body">
           <h6 class="card-title">${p.nombre || 'Producto'}</h6>
           <div class="rating">★★★★★</div>
 
           ${ofertaUSD !== null 
-            ? `<p class="oferta text-danger mb-1">${convertirPrecio(ofertaUSD)}</p>
-               <p class="precio muted"><del>${convertirPrecio(precioUSD)}</del></p>`
+            ? `<p class="oferta oferta mb-1">${convertirPrecio(ofertaUSD)}</p>
+               <p class="preciol muted"><del>${convertirPrecio(precioUSD)}</del></p>`
             : `<p class="precio fw-bold">${convertirPrecio(precioUSD)}</p>`}
 
           <button
