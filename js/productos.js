@@ -1,33 +1,33 @@
 // Lista de productos con categorías ajustadas
 const productos = [
 // 🎧 Audio
-{
-  nombre: "AirPods Pro 2",
-  precio: 9.5,
-  oferta: "",
-  categoria: "Audio",
-  imagen: "./img/Productos/AirpodsPro2.png"
-},
+  {
+    nombre: "AirPods Pro 2",
+    precio: 9.5,
+    oferta: "",
+    categoria: "Audio",
+    imagen: "./img/Productos/AirPodsMaximantados.png" 
+  },
   { 
     nombre: "AirPods 3ra", 
     precio: 9, 
     oferta: 8, 
     categoria: "Audio", 
-    imagen: "./img/Productos/Airpods3ra.png" 
+    imagen: "./img/Productos/AirPodsMaximantados.png"  
   },
   { 
     nombre: "AirPods Pro 2 ANC", 
     precio: 10.5, 
     oferta: "", 
     categoria: "Audio", 
-    imagen: "./img/Productos/AirpodsPro2.png"
+    imagen: "./img/Productos/AirPodsMaximantados.png" 
   },
   { 
     nombre: "AirPods 4ta", 
     precio: 11, 
     oferta: "", 
     categoria: "Audio", 
-    imagen: "./img/Productos/Airpods4ta.png" 
+    imagen: "./img/Productos/AirPodsMaximantados.png"  
   },
   { 
     nombre: "AirPods Max imantados", 
