@@ -64,10 +64,71 @@
       background-color: var(--color-turquesa);
       color: var(--color-base-blanco);
     }
+/* Overlay común (usada por login/register/carrito) */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1055;
+  display: none;
+}
+.popup-overlay.show { display: block; }
 
+/* Contenedor popup carrito (oculto por defecto) - ocupa toda la pantalla para centrar */
+.popup-carrito {
+  position: fixed;
+  inset: 0;
+  display: none;               /* se mostrará con .show */
+  align-items: center;         /* centra verticalmente */
+  justify-content: center;     /* centra horizontalmente */
+  z-index: 1060;
+  padding: 12px;
+}
 
+/* Mostrar popup con .show */
+.popup-carrito.show { display: flex; }
 
-     /* Botón flotante */
+/* Card interna del carrito: centrada, con altura automática y scroll interno si hace falta */
+.popup-carrito .popup-content {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  z-index: 1065;
+  max-height: 90vh;       /* no sobrepasa la ventana */
+  overflow: hidden;       /* el scroll lo maneja .popup-body */
+  margin: 0 auto;         /* asegura centrado en navegadores antiguos */
+}
+
+/* Header del carrito */
+.popup-carrito .popup-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  flex: 0 0 auto;
+}
+
+/* Body desplazable */
+.popup-carrito .popup-body {
+  padding: 12px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  max-height: calc(90vh - 140px); /* espacio para header + footer */
+}
+
+/* Footer fijo */
+.popup-carrito .popup-footer {
+  padding: 10px 12px;
+  border-top: 1px solid #eee;
+  flex: 0 0 auto;
+}
+
+/* Botón flotante (si lo usas) */
 #btn-carrito-flotante {
   position: fixed;
   bottom: 20px;
@@ -80,7 +141,6 @@
   justify-content: center;
   z-index: 1050;
 }
-
 #btn-carrito-flotante .badge {
   position: absolute;
   top: 8px;
@@ -88,19 +148,12 @@
   font-size: 0.8rem;
 }
 
-/* Popup carrito */
-.popup-carrito {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 320px;
-  max-height: 400px;
-  background: #fff;
-  border-radius: 8px;
-  overflow-y: auto;
-  display: none; /* oculto por defecto */
-  z-index: 1060;
+/* Responsive: en pantallas pequeñas ajustar ancho */
+@media (max-width: 480px) {
+  .popup-carrito .popup-content { max-width: 95%; }
+  .popup-carrito .popup-body { max-height: calc(92vh - 140px); }
 }
+
 
 .popup-header {
   background: #f8f9fa;
@@ -111,7 +164,6 @@
 .popup-body {
   padding: 10px;
   max-height: 250px;
-  overflow-y: auto;
 }
 
 .popup-footer {
@@ -269,6 +321,19 @@
     margin-top: -20px;
     border-radius: 20px;
 }
+
+.realizar-pedido{
+
+      background-color:var(--color-principal);
+    color: var(--color-base-blanco);
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: -20px;
+    border-radius: 20px;
+
+}
+
+
 .btn-comprar:hover {
     background-color:var(--color-base-negro);
     color: var(--color-base-blanco);
@@ -289,92 +354,113 @@ border-radius: 4px;
     color: var(--color-principal);
 
 }
+/* Overlay común (usada por login/register) */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1055;
+  display: none;
+}
 
+/* Mostrar overlay con .show */
+.popup-overlay.show { display: block; }
 
+/* Contenedor popup (oculto por defecto) */
+.popup-login {
+  position: fixed;
+  inset: 0;
+  display: none;               /* se mostrará con .show */
+  align-items: center;
+  justify-content: center;
+  z-index: 1060;
+  padding: 12px;
+}
 
+/* Mostrar popup con .show */
+.popup-login.show { display: flex; }
 
-    /* Popup login */
-    .popup-login {
-      position: fixed;
-      top: 50%;              /* centrado vertical */
-      left: 50%;             /* centrado horizontal */
-      transform: translate(-50%, -50%);
-      width: 750px;
-      max-width: 90%;        /* responsivo en pantallas pequeñas */
-      background: #fff;
-      border-radius: 20px;
-      display: none;         /* oculto por defecto */
-      z-index: 1060;
-      box-shadow: 0 10px 25px rgba(0,0,0,.2);
-      animation: slideIn .3s ease-out;
-    }
+/* Card interna: altura automática hasta un máximo, header fijo y body scrollable */
+.popup-content {
+  position: relative;
+  width: 100%;
+  max-width: 750px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
+  z-index: 1065;
 
-    .popup-header-IS {
-      background: var(--color-base-blanco);
-      padding: 10px 12px;
-      border-radius: 20px 20px 0px 0px;
+  /* altura automática según contenido, con límite para no salirse de la pantalla */
+  height: auto;
+  max-height: 90vh;    /* ajusta si quieres otro límite */
+  overflow: hidden;    /* el scroll lo maneja el cuerpo interno */
+}
 
-      
+/* Header fijo */
+.popup-header-IS {
+  background: var(--color-base-blanco);
+  padding: 10px 12px;
+  border-radius: 20px 20px 0 0;
+  flex: 0 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
 
-    }
+/* Cuerpo desplazable: ocupa el resto y hace scroll si hace falta */
+.popup-content > .container,
+.popup-body,
+.popup-content .popup-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling en iOS */
+  padding-top: 5px;
+  padding-bottom: 30px;
+  box-sizing: border-box;
+  /* limitar la altura interna para respetar el max-height del card */
+  max-height: calc(90vh - 80px); /* 90vh menos header (60px) y margen (20px) */
+}
 
-    .popup-content{
-    padding: 12px;
-    
-      
-    }
+/* Botones y formularios */
+.popup-login .form-control,
+.popup-login .btn,
+.popup-content-register .form-control,
+.popup-content-register .btn {
+  border-radius: 8px;
+}
 
-    .popup-login .form-control {
-      border-radius: 8px;
-    }
+/* Botones Google */
+.btn-google, .btn-google-register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-principal);
+  border: none;
+  padding: 8px 20px;
+  color: var(--color-base-blanco);
+  margin: 8px auto 0;
+  border-radius: 8px;
+  font-weight: 500;
+}
 
-    .popup-login .btn {
-      border-radius: 8px;
-    }
+/* Responsive: en pantallas pequeñas ocupa casi toda la pantalla y mantiene scroll */
+@media (max-width: 900px) {
+  .popup-content, .popup-content-register {
+    max-width: 95%;
+    border-radius: 12px;
+    max-height: 92vh;
+  }
+  .popup-content > .container,
+  .popup-body,
+  .popup-content .popup-scroll {
+    max-height: calc(92vh - 80px);
+  }
+}
 
-    @keyframes slideIn {
-      from { transform: translate(-50%, -40%); opacity: 0; }
-      to { transform: translate(-50%, -50%); opacity: 1; }
-    }
-
-    #btn-google-login {
-      border-radius: 8px;
-      font-weight: 500;
-    }
-    #btn-google-login i {
-      font-size: 1.2rem;
-    }
-
-    .btn-google{
-    display: flex;
-    background-color: var(--color-principal);
-    border: none;
-    padding: 5px 20px;
-    color: var(--color-base-blanco);
-    margin: auto;
-    }
-
-    .popup-content-register{
-    padding: 12px;
-
-    }
-
-    .btn-google-register{
-    display: flex;
-    background-color: var(--color-principal);
-    border: none;
-    padding: 5px 20px;
-    color: var(--color-base-blanco);
-    margin: auto;
-    }
-
-    #btn-google-register {
-      border-radius: 8px;
-      font-weight: 500;
-    }
-    #btn-google-register i {
-      font-size: 1.2rem;
-    }
 
 
     .dropdown-toggle-moneda{
@@ -464,6 +550,12 @@ border-radius: 4px;
   grid-template-columns: 1fr 360px;
   gap: 18px;
 }
+
+/* Opcional: asegurar separación y que en pantallas pequeñas se ajusten */
+@media (max-width: 576px) {
+  .form-check-inline { width: 100%; }
+}
+
 
 @media (max-width: 900px) {
   .checkout-grid { grid-template-columns: 1fr; }
