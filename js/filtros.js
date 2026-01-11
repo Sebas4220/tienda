@@ -1,23 +1,82 @@
+/* ---------------------------
+  Función aplicarFiltros (usa el array global `productos`)
+--------------------------- */
+function aplicarFiltros() {
+  const buscadorEl = document.getElementById("buscador");
+  const categoriaEl = document.getElementById("categoria");
+  const precioMinEl = document.getElementById("precioMin");
+  const precioMaxEl = document.getElementById("precioMax");
 
-  // Aplicar filtros
-  function aplicarFiltros() {
-    const texto = document.getElementById("buscador").value.toLowerCase();
-    const categoria = document.getElementById("categoria").value;
-    const precioMin = parseFloat(document.getElementById("precioMin").value) || 0;
-    const precioMax = parseFloat(document.getElementById("precioMax").value) || Infinity;
+  const texto = (buscadorEl?.value || "").trim().toLowerCase();
+  const categoria = (categoriaEl?.value || "").trim();
 
-    const filtrados = productos.filter(p => {
-      const matchTexto = p.nombre.toLowerCase().includes(texto);
-      const matchCategoria = categoria === "" || p.categoria === categoria;
-      const matchPrecio = p.precio >= precioMin && p.precio <= precioMax;
-      return matchTexto && matchCategoria && matchPrecio;
+  // Manejar campos vacíos como no límite
+  const precioMinRaw = precioMinEl?.value;
+  const precioMaxRaw = precioMaxEl?.value;
+  const precioMin = (precioMinRaw === "" || precioMinRaw === undefined) ? -Infinity : parseFloat(precioMinRaw);
+  const precioMax = (precioMaxRaw === "" || precioMaxRaw === undefined) ? Infinity : parseFloat(precioMaxRaw);
+
+  const min = Number.isFinite(precioMin) ? precioMin : -Infinity;
+  const max = Number.isFinite(precioMax) ? precioMax : Infinity;
+
+  // Asegurar lower/upper si el usuario invirtió min/max
+  const lower = Math.min(min, max);
+  const upper = Math.max(min, max);
+
+  const filtrados = productos.filter(p => {
+    const nombre = (p.nombre || "").toLowerCase();
+    const precio = Number(p.precio) || 0;
+    const matchTexto = texto === "" || nombre.includes(texto);
+    const matchCategoria = categoria === "" || (p.categoria || "") === categoria;
+    const matchPrecio = precio >= lower && precio <= upper;
+    return matchTexto && matchCategoria && matchPrecio;
+  });
+
+  // Renderizar la lista filtrada
+  renderProductos(filtrados);
+}
+
+/* ---------------------------
+  Función limpiarFiltros y binding del botón
+--------------------------- */
+function limpiarFiltros() {
+  const buscador = document.getElementById("buscador");
+  const categoria = document.getElementById("categoria");
+  const precioMin = document.getElementById("precioMin");
+  const precioMax = document.getElementById("precioMax");
+
+  if (buscador) buscador.value = "";
+  if (categoria) categoria.value = "";
+  if (precioMin) precioMin.value = "";
+  if (precioMax) precioMax.value = "";
+
+  aplicarFiltros();
+
+  if (buscador) buscador.focus();
+}
+
+/* ---------------------------
+  Enlazar eventos (mantén el resto igual)
+--------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const buscador = document.getElementById("buscador");
+  const categoria = document.getElementById("categoria");
+  const precioMin = document.getElementById("precioMin");
+  const precioMax = document.getElementById("precioMax");
+  const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+
+  if (buscador) buscador.addEventListener("input", aplicarFiltros);
+  if (categoria) categoria.addEventListener("change", aplicarFiltros);
+  if (precioMin) precioMin.addEventListener("input", aplicarFiltros);
+  if (precioMax) precioMax.addEventListener("input", aplicarFiltros);
+
+  if (btnLimpiar) {
+    btnLimpiar.addEventListener("click", (e) => {
+      e.preventDefault();
+      limpiarFiltros();
     });
-
-    renderProductos(filtrados);
   }
 
-  // Eventos de filtros
-  document.getElementById("buscador").addEventListener("input", aplicarFiltros);
-  document.getElementById("categoria").addEventListener("change", aplicarFiltros);
-  document.getElementById("precioMin").addEventListener("input", aplicarFiltros);
-  document.getElementById("precioMax").addEventListener("input", aplicarFiltros);
+  // Render inicial con todos los productos
+  renderProductos(productos);
+});

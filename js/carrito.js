@@ -1,16 +1,50 @@
-
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
 function guardarCarrito() {
   localStorage.setItem("carrito", JSON.stringify(carrito));
 }
 
+/* Abrir popup carrito mostrando overlay (crea overlay si no existe) */
 function abrirPopupCarrito() {
-  document.getElementById("popup-carrito").style.display = "block";
+  const popup = document.getElementById("popup-carrito");
+  if (!popup) return;
+
+  let overlay = document.getElementById("popup-carrito-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "popup-carrito-overlay";
+    overlay.className = "popup-overlay"; // usa tu clase CSS existente
+    document.body.appendChild(overlay);
+
+    // cerrar al hacer click en el overlay
+    overlay.addEventListener("click", () => {
+      cerrarPopupCarrito();
+    });
+  }
+
+  // Asegurar z-index correcto para que el popup quede por encima del overlay
+  overlay.style.zIndex = "1055";
+  overlay.style.display = "block";
+  overlay.setAttribute("aria-hidden", "false");
+
+  popup.style.display = "block";
+  popup.style.zIndex = "1060";
+  popup.setAttribute("aria-hidden", "false");
 }
 
+/* Cerrar popup carrito y ocultar overlay */
 function cerrarPopupCarrito() {
-  document.getElementById("popup-carrito").style.display = "none";
+  const popup = document.getElementById("popup-carrito");
+  const overlay = document.getElementById("popup-carrito-overlay");
+
+  if (popup) {
+    popup.style.display = "none";
+    popup.setAttribute("aria-hidden", "true");
+  }
+  if (overlay) {
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+  }
 }
 
 function actualizarCarrito() {
@@ -75,17 +109,18 @@ function actualizarCarrito() {
   guardarCarrito();
 }
 
-
 function cambiarCantidad(index, delta) {
   carrito[index].cantidad = (carrito[index].cantidad || 1) + delta;
   if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
-  document.getElementById("cart-count").textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  const countEl = document.getElementById("cart-count");
+  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
   actualizarCarrito();
 }
 
 function vaciarCarrito() {
   carrito = [];
-  document.getElementById("cart-count").textContent = 0;
+  const countEl = document.getElementById("cart-count");
+  if (countEl) countEl.textContent = 0;
   actualizarCarrito();
 }
 
@@ -99,22 +134,50 @@ function agregarAlCarrito(index, btn) {
     carrito.push({ ...producto, cantidad: 1 });
   }
 
-  document.getElementById("cart-count").textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  const countEl = document.getElementById("cart-count");
+  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
 
   const mensaje = btn.nextElementSibling;
-  mensaje.classList.remove("d-none");
-  setTimeout(() => mensaje.classList.add("d-none"), 2000);
+  if (mensaje) {
+    mensaje.classList.remove("d-none");
+    setTimeout(() => mensaje.classList.add("d-none"), 2000);
+  }
 
   actualizarCarrito();
 }
 
 function eliminarDelCarrito(index) {
   carrito.splice(index, 1);
-  document.getElementById("cart-count").textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  const countEl = document.getElementById("cart-count");
+  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
   actualizarCarrito();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("cart-count").textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  const countEl = document.getElementById("cart-count");
+  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
   actualizarCarrito();
+
+  // Si el overlay ya está en el DOM, enlazar cierre por click
+  const existingOverlay = document.getElementById("popup-carrito-overlay");
+  if (existingOverlay) {
+    existingOverlay.addEventListener("click", () => cerrarPopupCarrito());
+  }
+
+  // Enlazar botón de cerrar dentro del popup (asegura que funcione aunque overlay cubra algo)
+  const closeBtn = document.querySelector("#popup-carrito .btn-close");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      cerrarPopupCarrito();
+    });
+  }
+
+  // Cerrar con Escape si el popup está abierto
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const popup = document.getElementById("popup-carrito");
+      if (popup && popup.style.display !== "none") cerrarPopupCarrito();
+    }
+  });
 });
