@@ -12,10 +12,22 @@
 </head>
 <body>
 <!-- 🔝 Navbar -->
-<nav class="navbar navbar-expand-lg bg-dark">
+<nav class="navbar navbar-expand-lg bg-dark ">
   <div class="container">
     <!-- Logo -->
     <a class="navbar-brand text-white fw-bold" href="#">MiTienda</a>
+          <!-- Login / Registro -->
+      <ul class="navbar-nav d-block d-xs-block d-md-none d-lg-none" >
+        <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle-moneda text-white" href="#" id="currencyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span id="currentCurrency"><img src="./img/Bandera/Estados Unidos.png" width="25px" class="me-2" alt="">USD</span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="currencyDropdown">
+            <li><a class="dropdown-item" href="#" id="currency-usd" data-currency="USD"><img src="./img/Bandera/Estados Unidos.png" width="25px" class="me-2" alt=""> USD</a></li>
+            <li><a class="dropdown-item" href="#" id="currency-bs" data-currency="Bs"><img src="./img/Bandera/Venezuela.png" width="25px" class="me-2" alt=""> Bs</a></li>
+        </ul>
+        </li>
+      </ul>
 
     <!-- Botón hamburguesa en móviles -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
@@ -58,6 +70,8 @@
     </div>
   </div>
 </nav>
+
+
 
 <!-- Overlay para carrito (puede ir al inicio del body) -->
 <div id="popup-carrito-overlay" class="popup-overlay" aria-hidden="true"></div>
