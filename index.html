@@ -425,57 +425,51 @@
 
 
 
-<div class="container py-2">
-    <div class="row">
-        <div class="col-12">           
-                <!-- Filtros -->
-            <div class="container my-2">
-            <div class="row g-3">
-                <!-- Buscador -->
-                <div class="col-md-6 col-6">
-                <label for="buscador" class="form-label">Buscar producto</label>
-                <input type="text" id="buscador" class="form-control" placeholder="Escribe el nombre...">
-                </div>
+        
+    <!-- Filtros -->
+<div class="container my-4">
+  <div class="row ">
+      <!-- Buscador -->
+      <div class="col-md-6 col-6">
+      <label for="buscador" class="form-label">Buscar producto</label>
+      <input type="text" id="buscador" class="form-control" placeholder="Escribe el nombre...">
+      </div>
 
-                <!-- Categorías -->
-                <div class="col-md-2 col-6">
-                <label for="categoria" class="form-label">Categoría</label>
-                <select id="categoria" class="form-select mb-1"> 
-                    <option value="">Todas</option> 
-                    <option value="Audio">Audio</option> 
-                    <option value="Relojes">Relojes</option> 
-                    <option value="Accesorios">Accesorios</option> 
-                    <option value="Iluminación">Iluminación</option> 
-                    <option value="Gamer">Gamer</option> 
-                    <option value="Tecnología">Tecnología</option> 
-                </select>
-                </div>
+      <!-- Categorías -->
+      <div class="col-md-2 col-6">
+      <label for="categoria" class="form-label">Categoría</label>
+      <select id="categoria" class="form-select mb-1"> 
+          <option value="">Todas</option> 
+          <option value="Audio">Audio</option> 
+          <option value="Relojes">Relojes</option> 
+          <option value="Accesorios">Accesorios</option> 
+          <option value="Iluminación">Iluminación</option> 
+          <option value="Gamer">Gamer</option> 
+          <option value="Tecnología">Tecnología</option> 
+      </select>
+      </div>
 
-                <!-- Precios -->
-                <div class="col-md-2 col-6">
-                <label class="form-label">Precio</label>
-                <div class="d-flex gap-2 mb-1"> 
-                    <input type="number" id="precioMin" class="form-control" placeholder="Mínimo"> 
-                    <input type="number" id="precioMax" class="form-control" placeholder="Máximo"> 
-                </div>
-                </div>
-                <!-- Añade este botón dentro del bloque de filtros (por ejemplo al final de la fila) -->
-                <div class="col-md-2 col-6">
-                  <label class="form-label d-block">&nbsp;</label>
-                  <button id="btn-limpiar-filtros" class="btn btn-outline-secondary w-100" type="button">Limpiar filtros</button>
-                </div>
-
-            </div>
-            </div>
-        </div>
-        <div class="col-md-12">
-              <div id="productos" class="row g-4 mt-1"></div>
-        </div>
-    </div>
+      <!-- Precios -->
+      <div class="col-md-2 col-12">
+      <label class="form-label">Precio</label>
+      <div class="d-flex gap-2 mb-1"> 
+          <input type="number" id="precioMin" class="form-control" placeholder="Mínimo"> 
+          <input type="number" id="precioMax" class="form-control" placeholder="Máximo"> 
+      </div>
+      </div>
+      <!-- Añade este botón dentro del bloque de filtros (por ejemplo al final de la fila) -->
+      <div class="col-md-2 col-12">
+        <label class="form-label d-block">&nbsp;</label>
+        <button id="btn-limpiar-filtros" class="btn btn-outline-secondary w-100" type="button">Limpiar filtros</button>
+      </div>
+      <!-- Contenedor de productos -->
+      <div class="col-md-12 mt-4">
+            <div id="productos" class="row g-4 mt-1"></div>
+      </div>
+  </div>
 </div>
 
 
-<!-- Contenedor de productos -->
 
 <script src="./js/moneda.js"></script> 
 <script src="./js/productos.js"></script>
