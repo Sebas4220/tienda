@@ -1,30 +1,57 @@
-let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+// carrito.js (actualizado mínimamente para integrarse con productos.js)
+// Cambios mínimos:
+// - usar window.carrito como estado compartido (productos.js lo lee)
+// - guardarCarrito emite 'carrito:changed' tras persistir
+// - las mutaciones llaman a guardarCarrito() para notificar en tiempo real
+// - añadir listener 'storage' para sincronizar entre pestañas
+// - abrir/cerrar popup robustos con overlay y listener global de cierre
+// - cuando un producto se elimina (o su cantidad baja a 0), intentar recargar la página
+//   llamando a window.recargarPaginaAlEliminar() si existe, o usando location.reload() como fallback
+// El resto del comportamiento se mantiene igual.
 
-function guardarCarrito() {
-  localStorage.setItem("carrito", JSON.stringify(carrito));
+window.carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+// Helpers mínimos (no sobrescriben si ya existen)
+if (typeof safeNumber !== "function") {
+  window.safeNumber = function (v, fallback = 0) {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
+}
+if (typeof convertirPrecio !== "function") {
+  window.convertirPrecio = function (n) {
+    return '$' + Number(n || 0).toFixed(2);
+  };
 }
 
-/* Abrir popup carrito mostrando overlay (crea overlay si no existe) */
+function guardarCarrito() {
+  try {
+    localStorage.setItem("carrito", JSON.stringify(window.carrito));
+  } catch (e) {
+    console.warn("No se pudo guardar carrito en localStorage:", e);
+  }
+  // Notificar a productos.js y otros listeners que el carrito cambió
+  try {
+    document.dispatchEvent(new CustomEvent('carrito:changed', { detail: { carrito: window.carrito } }));
+  } catch (e) { /* ignore */ }
+}
+
+/* Abrir / cerrar popup carrito (robustos: crean/usan overlay y manejan aria-hidden) */
 function abrirPopupCarrito() {
   const popup = document.getElementById("popup-carrito");
   if (!popup) return;
 
+  // Crear overlay si no existe
   let overlay = document.getElementById("popup-carrito-overlay");
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.id = "popup-carrito-overlay";
-    overlay.className = "popup-overlay"; // usa tu clase CSS existente
+    overlay.className = "popup-overlay";
     document.body.appendChild(overlay);
-
-    // cerrar al hacer click en el overlay
-    overlay.addEventListener("click", () => {
-      cerrarPopupCarrito();
-    });
   }
 
-  // Asegurar z-index correcto para que el popup quede por encima del overlay
-  overlay.style.zIndex = "1055";
   overlay.style.display = "block";
+  overlay.style.zIndex = "1055";
   overlay.setAttribute("aria-hidden", "false");
 
   popup.style.display = "block";
@@ -32,7 +59,6 @@ function abrirPopupCarrito() {
   popup.setAttribute("aria-hidden", "false");
 }
 
-/* Cerrar popup carrito y ocultar overlay */
 function cerrarPopupCarrito() {
   const popup = document.getElementById("popup-carrito");
   const overlay = document.getElementById("popup-carrito-overlay");
@@ -47,23 +73,38 @@ function cerrarPopupCarrito() {
   }
 }
 
+/* Listener global para cerrar popup (overlay o botones .btn-close dentro del popup) */
+document.addEventListener("click", (e) => {
+  // Cerrar si se hace click en el overlay
+  if (e.target && e.target.id === "popup-carrito-overlay") {
+    cerrarPopupCarrito();
+    return;
+  }
+  // Cerrar si se hace click en un botón con clase .btn-close dentro del popup
+  const closeBtn = e.target.closest && e.target.closest("#popup-carrito .btn-close");
+  if (closeBtn) {
+    e.preventDefault();
+    cerrarPopupCarrito();
+  }
+});
+
+/* Renderizar contenido del carrito en el popup */
 function actualizarCarrito() {
   const carritoContenido = document.getElementById("carrito-contenido");
   const carritoTotal = document.getElementById("carrito-total");
 
   if (!carritoContenido || !carritoTotal) return; // evita errores si faltan elementos
 
-  if (!Array.isArray(carrito) || carrito.length === 0) {
+  if (!Array.isArray(window.carrito) || window.carrito.length === 0) {
     carritoContenido.innerHTML = "<p>No hay productos en el carrito.</p>";
     carritoTotal.textContent = convertirPrecio(0);
-    guardarCarrito();
     return;
   }
 
   let totalUSD = 0;
   let html = "<div class='row g-2'>";
 
-  carrito.forEach((p, i) => {
+  window.carrito.forEach((p, i) => {
     // Normalizar precios a número (USD)
     const precioUSD = safeNumber(p.precio, 0);
     const ofertaUSD = p.oferta !== undefined && p.oferta !== "" ? safeNumber(p.oferta, null) : null;
@@ -84,7 +125,7 @@ function actualizarCarrito() {
               <div>
                 <h6 class="mb-1">${p.nombre || 'Producto'}</h6>
                 ${ofertaUSD !== null 
-                  ? `<small><del class="preciol">${convertirPrecio(precioUSD)}</del> <span class="ofertaCarrito fw-bold">${convertirPrecio(ofertaUSD)}</span></small>` 
+                  ? `<small><del >${convertirPrecio(precioUSD)}</del> <span class="ofertaCarrito fw-bold">${convertirPrecio(ofertaUSD)}</span></small>` 
                   : `<small class="fw-bold">${convertirPrecio(precioUSD)}</small>`}
                 <div class="mt-1">
                   <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${i}, -1)"> - </button>
@@ -94,7 +135,7 @@ function actualizarCarrito() {
                 <small class="text-muted">Subtotal: ${convertirPrecio(subtotalUSD)}</small>
               </div>
             </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="eliminarDelCarrito(${i})">
+            <button class="btn btn-sm btn-outline-danger" onclick="eliminarDelCarrito(${i})" aria-label="Eliminar ${p.nombre}">
               <i class="bi bi-trash"></i>
             </button>
           </div>
@@ -106,78 +147,128 @@ function actualizarCarrito() {
   html += "</div>";
   carritoContenido.innerHTML = html;
   carritoTotal.textContent = convertirPrecio(totalUSD);
-  guardarCarrito();
+}
+
+/* Utilidad local: intenta recargar la página usando la función expuesta por productos.js si existe,
+   o con location.reload() como fallback. delay en ms (por defecto 120). */
+function _recargarPaginaSiCorresponde(delay = 120) {
+  setTimeout(() => {
+    try {
+      if (typeof window.recargarPaginaAlEliminar === "function") {
+        window.recargarPaginaAlEliminar(delay);
+      } else {
+        location.reload();
+      }
+    } catch (e) {
+      try { location.reload(); } catch (err) { /* ignore */ }
+    }
+  }, Number(delay) || 120);
 }
 
 function cambiarCantidad(index, delta) {
-  carrito[index].cantidad = (carrito[index].cantidad || 1) + delta;
-  if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+  if (!Array.isArray(window.carrito) || !window.carrito[index]) return;
+
+  // detectar si la operación eliminará el producto
+  const willRemove = ((window.carrito[index].cantidad || 1) + delta) <= 0;
+  const removedName = willRemove ? window.carrito[index].nombre : null;
+
+  window.carrito[index].cantidad = (window.carrito[index].cantidad || 1) + delta;
+  if (window.carrito[index].cantidad <= 0) {
+    window.carrito.splice(index, 1);
+  }
+
   const countEl = document.getElementById("cart-count");
-  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  if (countEl) countEl.textContent = window.carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+
+  // persistir y notificar
+  guardarCarrito();
   actualizarCarrito();
+
+  // si se eliminó el producto, recargar la página para que productos.js pueda mostrar el botón "Agregar"
+  if (willRemove && removedName) {
+    _recargarPaginaSiCorresponde();
+  }
 }
 
 function vaciarCarrito() {
-  carrito = [];
+  window.carrito = [];
   const countEl = document.getElementById("cart-count");
   if (countEl) countEl.textContent = 0;
+  guardarCarrito();
   actualizarCarrito();
+  // recargar para asegurar consistencia en productos.js
+  _recargarPaginaSiCorresponde();
 }
 
 function agregarAlCarrito(index, btn) {
   const producto = productos[index];
-  const existente = carrito.find(p => p.nombre === producto.nombre);
+  const existente = window.carrito.find(p => p.nombre === producto.nombre);
 
   if (existente) {
     existente.cantidad = (existente.cantidad || 1) + 1;
   } else {
-    carrito.push({ ...producto, cantidad: 1 });
+    window.carrito.push({ ...producto, cantidad: 1 });
   }
 
   const countEl = document.getElementById("cart-count");
-  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  if (countEl) countEl.textContent = window.carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
 
-  const mensaje = btn.nextElementSibling;
-  if (mensaje) {
+  const mensaje = btn ? btn.nextElementSibling : null;
+  if (mensaje && mensaje.classList) {
     mensaje.classList.remove("d-none");
     setTimeout(() => mensaje.classList.add("d-none"), 2000);
   }
 
+  // persistir y notificar
+  guardarCarrito();
   actualizarCarrito();
 }
 
 function eliminarDelCarrito(index) {
-  carrito.splice(index, 1);
+  if (!Array.isArray(window.carrito) || !window.carrito[index]) return;
+
+  // capturar nombre antes de eliminar (por si queremos recargar)
+  const removedName = window.carrito[index].nombre;
+
+  window.carrito.splice(index, 1);
+
   const countEl = document.getElementById("cart-count");
-  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  if (countEl) countEl.textContent = window.carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+
+  guardarCarrito();
   actualizarCarrito();
+
+  // intentar recargar la página para que productos.js muestre el botón "Agregar" inmediatamente
+  _recargarPaginaSiCorresponde();
 }
+
+// Sincronizar entre pestañas (storage)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'carrito') {
+    try {
+      window.carrito = JSON.parse(e.newValue) || [];
+    } catch (err) {
+      window.carrito = [];
+    }
+    const countEl = document.getElementById("cart-count");
+    if (countEl) countEl.textContent = window.carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+    if (typeof sincronizarTarjetas === "function") sincronizarTarjetas();
+    actualizarCarrito();
+  }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   const countEl = document.getElementById("cart-count");
-  if (countEl) countEl.textContent = carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
+  if (countEl) countEl.textContent = window.carrito.reduce((acc, p) => acc + (p.cantidad || 1), 0);
   actualizarCarrito();
-
-  // Si el overlay ya está en el DOM, enlazar cierre por click
-  const existingOverlay = document.getElementById("popup-carrito-overlay");
-  if (existingOverlay) {
-    existingOverlay.addEventListener("click", () => cerrarPopupCarrito());
-  }
-
-  // Enlazar botón de cerrar dentro del popup (asegura que funcione aunque overlay cubra algo)
-  const closeBtn = document.querySelector("#popup-carrito .btn-close");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      cerrarPopupCarrito();
-    });
-  }
-
-  // Cerrar con Escape si el popup está abierto
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const popup = document.getElementById("popup-carrito");
-      if (popup && popup.style.display !== "none") cerrarPopupCarrito();
-    }
-  });
 });
+
+// Exponer funciones globales (compatibilidad con HTML inline)
+window.abrirPopupCarrito = abrirPopupCarrito;
+window.cerrarPopupCarrito = cerrarPopupCarrito;
+window.actualizarCarrito = actualizarCarrito;
+window.cambiarCantidad = cambiarCantidad;
+window.vaciarCarrito = vaciarCarrito;
+window.agregarAlCarrito = agregarAlCarrito;
+window.eliminarDelCarrito = eliminarDelCarrito;
+window.guardarCarrito = guardarCarrito;

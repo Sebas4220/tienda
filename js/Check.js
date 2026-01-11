@@ -25,24 +25,3 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// JS: mostrar/ocultar info según radio seleccionado
-function mostrarInfoPago() {
-  const selected = document.querySelector('input[name="pay-method"]:checked');
-  const value = selected ? selected.value : null;
-
-  const blocks = {
-    cash: document.getElementById('pay-info-cash'),
-    card: document.getElementById('pay-info-card'),
-    usd:  document.getElementById('pay-info-usd')
-  };
-
-  Object.values(blocks).forEach(b => { if (b) b.style.display = 'none'; });
-  if (value && blocks[value]) blocks[value].style.display = '';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  mostrarInfoPago();
-  document.querySelectorAll('input[name="pay-method"]').forEach(radio => {
-    radio.addEventListener('change', mostrarInfoPago);
-  });
-});
