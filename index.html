@@ -59,22 +59,28 @@
   </div>
 </nav>
 
+<!-- Overlay para carrito (puede ir al inicio del body) -->
+<div id="popup-carrito-overlay" class="popup-overlay" aria-hidden="true"></div>
 
-    <!-- 🛒 Popup del carrito -->
-<div id="popup-carrito" class="popup-carrito shadow-lg">
-  <div class="popup-header d-flex justify-content-between align-items-center">
-    <h6 class="mb-0"><i class="bi bi-cart"></i> Carrito</h6>
-    <button class="btn-close btn-sm" onclick="cerrarPopupCarrito()"></button>
-  </div>
-  <div id="carrito-contenido" class="popup-body">
-    <p>No hay productos en el carrito.</p>
-  </div>
-  <div class="popup-footer text-end">
-    <h6>Total: <span id="carrito-total" class=" fw-bold">$0.00</span></h6>
-    <button class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">
-      <i class="bi bi-trash"></i> Vaciar
-    </button>
-    <button class="btn-finalizar-compra btn-sm">Finalizar compra</button>
+<!-- 🛒 Popup del carrito -->
+<div id="popup-carrito" class="popup-carrito" aria-hidden="true" role="dialog" aria-labelledby="carrito-title">
+  <div class="popup-content">
+    <div class="popup-header d-flex justify-content-between align-items-center">
+      <h6 id="carrito-title" class="mb-0"><i class="bi bi-cart"></i> Carrito</h6>
+      <button class="btn-close btn-sm" data-popup-close="carrito" aria-label="Cerrar carrito"></button>
+    </div>
+
+    <div id="carrito-contenido" class="popup-body">
+      <p>No hay productos en el carrito.</p>
+    </div>
+
+    <div class="popup-footer text-end">
+      <h6>Total: <span id="carrito-total" class="fw-bold">$0.00</span></h6>
+      <button class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">
+        <i class="bi bi-trash"></i> Vaciar
+      </button>
+      <button class="btn-finalizar-compra btn btn-primary btn-sm">Finalizar compra</button>
+    </div>
   </div>
 </div>
 
@@ -101,45 +107,87 @@
         <section class="checkout-form">
           <h5>Datos de envío</h5>
           <form id="checkoutForm" novalidate>
-            <div class="mb-2">
-              <label for="ship-name" class="form-label">Nombre completo</label>
-              <input id="ship-name" class="form-control" required />
-            </div>
+            <div class="row g-2">
+              <div class="col-md-3 col-12">
+                <div class="mb-2">
+                  <label for="ship-name" class="form-label">Nombre completo</label>
+                  <input id="ship-name" class="form-control" required />
+                </div>
+              </div>
 
-            <div class="mb-2">
-              <label for="ship-phone" class="form-label">Teléfono</label>
-              <input id="ship-phone" class="form-control" required />
-            </div>
+              <div class="col-md-3 col-12">
+                <div class="mb-2">
+                  <label for="ship-phone" class="form-label">Teléfono</label>
+                  <input id="ship-phone" class="form-control" required />
+                </div>
+              </div>
 
-            <div class="mb-2">
-              <label for="ship-address" class="form-label">Dirección</label>
-              <input id="ship-address" class="form-control" required />
-            </div>
+              <div class="col-md-3 col-12">
+                <div class="mb-2">
+                  <label for="ship-address" class="form-label">Dirección</label>
+                  <input id="ship-address" class="form-control" required />
+                </div>
+              </div>
 
-            <div class="mb-2">
-              <label for="ship-city" class="form-label">Ciudad</label>
-              <input id="ship-city" class="form-control" required />
-            </div>
+              <div class="col-md-3 col-12">
+                <div class="mb-2">
+                  <label for="ship-city" class="form-label">Ciudad</label>
+                  <input id="ship-city" class="form-control" required />
+                </div>
+              </div>
+              </div>
+
 
             <h6 class="mt-3">Método de pago</h6>
-            <div class="mb-2">
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="pay-method" id="pay-cash" value="cash" checked>
-                <label class="form-check-label" for="pay-cash">Efectivo / Transferencia (Bs)</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="pay-method" id="pay-card" value="card">
-                <label class="form-check-label" for="pay-card">Tarjeta (simulado)</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="pay-method" id="pay-usd" value="usd">
-                <label class="form-check-label" for="pay-usd">Pagar en USD</label>
-              </div>
-            </div>
+              <!-- Radios en una fila -->
+              <div class="d-flex flex-wrap align-items-center gap-3" role="radiogroup" aria-label="Método de pago">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="pay-method" id="pay-cash" value="cash" checked>
+                  <label class="form-check-label" for="pay-cash">Efectivo / Transferencia (Bs)</label>
+                </div>
 
-            <div class="mt-3">
-              <button id="btn-place-order" type="submit" class="btn btn-success w-100">Realizar pedido</button>
-            </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="pay-method" id="pay-card" value="card">
+                  <label class="form-check-label" for="pay-card">Tarjeta (simulado)</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="pay-method" id="pay-usd" value="usd">
+                  <label class="form-check-label" for="pay-usd">Pagar en USD</label>
+                </div>
+              </div>
+
+              <!-- Contenedores de información (sin cambios funcionales) -->
+              <div id="pay-info" class="mt-3">
+                <div id="pay-info-cash" class="pay-info-block">
+                  <h6>Pago en Bolívares</h6>
+                  <p>Puedes pagar en efectivo o por transferencia bancaria. Indica tu número de referencia al finalizar.</p>
+                  <ul>
+                    <li>Cuenta: 0123-456789</li>
+                    <li>Banco: EjemploBank</li>
+                    <li>Instrucciones: enviar comprobante al WhatsApp</li>
+                  </ul>
+                </div>
+
+                <div id="pay-info-card" class="pay-info-block" style="display:none;">
+                  <h6>Pago con Tarjeta (simulado)</h6>
+                  <p>El pago con tarjeta se simula en este entorno. Se solicitarán los datos de la tarjeta en el siguiente paso.</p>
+                  <ul>
+                    <li>Tarjeta: Visa / MasterCard</li>
+                    <li>Seguridad: 3D Secure simulado</li>
+                  </ul>
+                </div>
+
+                <div id="pay-info-usd" class="pay-info-block" style="display:none;">
+                  <h6>Pagar en USD</h6>
+                  <p>Si eliges pagar en USD, el total se mostrará en dólares y se aplicará la tasa de conversión vigente.</p>
+                  <ul>
+                    <li>Moneda: USD</li>
+                    <li>Conversión: calculada al confirmar pedido</li>
+                  </ul>
+                </div>
+              </div>
+
           </form>
         </section>
 
@@ -165,6 +213,9 @@
             <div class="mt-2">
               <small class="text-muted">Moneda: <span id="checkout-currency-label"></span></small>
             </div>
+            <div class="mt-3">
+              <button id="btn-place-order" type="submit" class="btn realizar-pedido w-100">Realizar pedido</button>
+            </div>
           </div>
         </aside>
       </div>
@@ -183,61 +234,67 @@
   <i class="bi bi-cart"></i>
   <span id="cart-count" class="badge bg-danger rounded-pill">0</span>
 </button>
-
+<!-- Overlay (colocado antes de los popups para claridad) -->
+<div id="popup-login-overlay" class="popup-overlay" aria-hidden="true"></div>
+<div id="popup-register-overlay" class="popup-overlay" aria-hidden="true"></div>
 
 <!-- 🔐 Popup de Login -->
-<div id="popup-login" class="popup-login shadow-lg" aria-hidden="true">
-  <div class="popup-header-IS d-flex justify-content-end align-items-center">
-    <button class="btn-close btn-sm" aria-label="Cerrar" onclick="cerrarPopupLogin()"></button>
-  </div>
-  <div class="popup-content pb-4">
-    <div class="container">
+<div id="popup-login" class="popup-login" aria-hidden="true" role="dialog" aria-labelledby="login-title">
+  <div class="popup-content">
+    <div class="popup-header-IS d-flex justify-content-end align-items-center">
+      <button class="btn-close btn-sm" aria-label="Cerrar" data-popup-close="login"></button>
+    </div>
+
+    <div class="popup-body">
+      <div class="container">
         <div class="row">
-            <div class="col-md-6 col-12">
-              <h1>Te damos la Bienvenida</h1>
-              <img src="./img/Bandera/Venezuela.png" width="100%" alt="">
-              <p class="mt-2"><b>Inicia sesión y mantente al tanto de nuestras ofertas exclusivas.</b></p>
-            </div>
-            <div class="col-md-6 col-12">
-                <form id="loginForm" novalidate>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Correo electrónico</label>
-                    <input type="email" class="form-control" id="email" placeholder="usuario@correo.com" required />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="password" placeholder="********" required />
-                </div>
-                    <a href="#" class="small text-primary">¿Olvidaste tu contraseña?</a>
-                <button type="submit" class="btn btn-primary w-100 mt-3">Ingresar</button>
-                <button type="button" class="btn-google w-60 mt-2" id="btn-google-login">
-                    <i class="bi bi-google me-2"></i> Iniciar sesión con Gmail
-                </button>
-                </form>
-                <hr />
-                <p class="text-center mb-0">¿No tienes cuenta? <a href="#" onclick="abrirPopupRegister(); return false;">Regístrate</a></p>
-            </div>
+          <div class="col-md-6 col-12">
+            <h1 id="login-title">Te damos la Bienvenida</h1>
+            <img src="./img/Bandera/Venezuela.png" width="100%" alt="">
+            <p class="mt-2"><b>Inicia sesión y mantente al tanto de nuestras ofertas exclusivas.</b></p>
+          </div>
+          <div class="col-md-6 col-12">
+            <form id="loginForm" novalidate>
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="usuario@correo.com" required />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" placeholder="********" required />
+              </div>
+              <a href="#" class="small text-primary">¿Olvidaste tu contraseña?</a>
+              <button type="submit" class="btn btn-primary w-100 mt-3">Ingresar</button>
+              <button type="button" class="btn-google w-60 mt-2" id="btn-google-login">
+                <i class="bi bi-google me-2"></i> Iniciar sesión con Gmail
+              </button>
+            </form>
+            <hr />
+            <p class="text-center mb-0">¿No tienes cuenta? <a href="#" onclick="abrirPopupRegister(); return false;">Regístrate</a></p>
+          </div>
         </div>
+      </div>
     </div>
   </div>
 </div>
 
-
 <!-- 📝 Popup de Registro -->
-<div id="popup-register" class="popup-login shadow-lg" aria-hidden="true">
-  <div class="popup-header-IS d-flex justify-content-end align-items-center">
-    <button class="btn-close btn-sm" aria-label="Cerrar" onclick="cerrarPopupRegister()"></button>
-  </div>
-  <div class="popup-content-register pb-4">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 col-12">
-          <h1>Te damos la Bienvenida</h1>
-          <img src="./img/Bandera/Venezuela.png" width="100%" alt="">
-          <p class="mt-2"><b>Registrate y disfruta todas nuestras ofertas exclusivas.</b></p>
-        </div>
-        <div class="col-md-6 col-12">
-              <form id="registerForm" novalidate>
+<div id="popup-register" class="popup-login" aria-hidden="true" role="dialog" aria-labelledby="register-title">
+  <div class="popup-content">
+    <div class="popup-header-IS d-flex justify-content-end align-items-center">
+      <button class="btn-close btn-sm" aria-label="Cerrar" data-popup-close="register"></button>
+    </div>
+
+    <div class="popup-body popup-content-register">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-12">
+            <h1 id="register-title">Te damos la Bienvenida</h1>
+            <img src="./img/Bandera/Venezuela.png" width="100%" alt="">
+            <p class="mt-2"><b>Registrate y disfruta todas nuestras ofertas exclusivas.</b></p>
+          </div>
+          <div class="col-md-6 col-12">
+            <form id="registerForm" novalidate>
               <div class="mb-3">
                 <label for="reg-name" class="form-label">Nombre completo</label>
                 <input type="text" class="form-control" id="reg-name" placeholder="Tu nombre" required />
@@ -259,6 +316,7 @@
             <p class="text-center mt-3 mb-0">¿Ya tienes cuenta? 
               <a href="#" onclick="abrirPopupLogin(); return false;">Inicia sesión</a>
             </p>
+          </div>
         </div>
       </div>
     </div>
@@ -378,7 +436,7 @@
                 </div>
 
                 <!-- Categorías -->
-                <div class="col-md-3 col-6">
+                <div class="col-md-2 col-6">
                 <label for="categoria" class="form-label">Categoría</label>
                 <select id="categoria" class="form-select mb-1"> 
                     <option value="">Todas</option> 
@@ -392,13 +450,19 @@
                 </div>
 
                 <!-- Precios -->
-                <div class="col-md-3 col-6">
+                <div class="col-md-2 col-6">
                 <label class="form-label">Precio</label>
                 <div class="d-flex gap-2 mb-1"> 
                     <input type="number" id="precioMin" class="form-control" placeholder="Mínimo"> 
                     <input type="number" id="precioMax" class="form-control" placeholder="Máximo"> 
                 </div>
                 </div>
+                <!-- Añade este botón dentro del bloque de filtros (por ejemplo al final de la fila) -->
+                <div class="col-md-2 col-6">
+                  <label class="form-label d-block">&nbsp;</label>
+                  <button id="btn-limpiar-filtros" class="btn btn-outline-secondary w-100" type="button">Limpiar filtros</button>
+                </div>
+
             </div>
             </div>
         </div>
@@ -417,6 +481,7 @@
 <script src="./js/filtros.js"></script>
 <script src="./js/Chekaut.js"></script>
 <script src="./js/login.js"></script>
+<script src="./js/Check.js"></script>
 
 
   <!-- 📩 Footer -->
