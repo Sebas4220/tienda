@@ -170,6 +170,7 @@ const productos = [
   { nombre: "Micrófono SX23", precio: 26, oferta: "", categoria: "Tecnología" }
 ];
 
+
 // productos.js (completo, actualizado: recarga la página al eliminar un producto)
 // - Reemplaza botón "Agregar" por controles (- cantidad + eliminar) en tiempo real
 // - Mantiene controles tras recargar si el producto está en el carrito
