@@ -56,7 +56,25 @@ function limpiarFiltros() {
 }
 
 /* ---------------------------
-  Enlazar eventos (mantén el resto igual)
+  Reiniciar todos los filtros y aplicar la categoría seleccionada
+  (guarda la categoría seleccionada, limpia todo, vuelve a establecerla y aplica)
+--------------------------- */
+function reiniciarFiltrosYSeleccionarCategoria(selectedValue) {
+  // limpiar todo
+  limpiarFiltros();
+
+  // volver a establecer la categoría seleccionada y aplicar
+  const categoriaEl = document.getElementById("categoria");
+  if (categoriaEl) {
+    categoriaEl.value = selectedValue || "";
+  }
+
+  // aplicar filtros con la categoría recién establecida
+  aplicarFiltros();
+}
+
+/* ---------------------------
+  Enlazar eventos (actualizado)
 --------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   const buscador = document.getElementById("buscador");
@@ -66,7 +84,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnLimpiar = document.getElementById("btn-limpiar-filtros");
 
   if (buscador) buscador.addEventListener("input", aplicarFiltros);
-  if (categoria) categoria.addEventListener("change", aplicarFiltros);
+
+  // Al cambiar de categoría: reiniciar todos los filtros y aplicar la categoría seleccionada
+  if (categoria) {
+    categoria.addEventListener("change", (e) => {
+      const seleccionado = (e.target?.value || "").trim();
+      reiniciarFiltrosYSeleccionarCategoria(seleccionado);
+
+      // opcional: mover foco al contenedor de productos para mejorar UX
+      const productosEl = document.getElementById("productos");
+      if (productosEl) productosEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   if (precioMin) precioMin.addEventListener("input", aplicarFiltros);
   if (precioMax) precioMax.addEventListener("input", aplicarFiltros);
 
